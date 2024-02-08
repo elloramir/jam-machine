@@ -1,3 +1,6 @@
+-- Copyright 2024 Elloramir.
+-- All rights over the code are reserved.
+
 local Object = require("classic")
 local Image = Object:extend()
 
@@ -15,7 +18,7 @@ function Image:new(filename, fw, fh)
 		for x=0, self.img:getWidth()-self.width, self.width  do
 			table.insert(self.quads,
 				love.graphics.newQuad(x, y, self.width, self.height, self.img))
-		end 
+		end
 	end
 end
 

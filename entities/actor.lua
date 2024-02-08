@@ -1,13 +1,17 @@
+-- Copyright 2024 Elloramir.
+-- All rights over the code are reserved.
+
 local level = require("level")
 local Entity = require("entity")
 local Actor = Entity:extend()
 
+-- NOTE(ellora): check by metatable are slow, this is
+-- the only viable way to check if an object is an actor.
+Actor.is_actor = true
+
+
 function Actor:new(x, y, w, h, ox, oy)
 	Entity.new(self)
-
-	-- NOTE(ellora): check by metatable are slow, this is
-	-- the only viable way to check if an object is an actor.
-	self.is_actor = true
 
 	self.x = x
 	self.y = y
@@ -40,10 +44,6 @@ function Actor:set_image(image, speed)
 		self.frame_timer = 0
 		self.frame = 1
 	end
-end
-
-function Actor:tile()
-	return math.floor(self.x/TILE_SIZE), math.floor(self.y/TILE_SIZE)
 end
 
 function Actor:overlaps(other, ox, oy)

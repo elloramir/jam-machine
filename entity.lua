@@ -1,3 +1,6 @@
+-- Copyright 2024 Elloramir.
+-- All rights over the code are reserved.
+
 local Object = require("classic")
 local Entity = Object:extend()
 
