@@ -6,16 +6,20 @@ local Entity = Object:extend()
 
 function Entity:new(order)
 	self.active = true
-	self.time_creation = love.timer.getTime()/1e7
+	self:gen_order_seed()
 	self:set_order(order or 0)
 end
 
+function Entity:gen_order_seed()
+	self.time_seed = love.timer.getTime()/1e7
+end
+
 function Entity:set_order(order)
-	self.order = order+self.time_creation
+	self.order = order+self.time_seed
 end
 
 -- since we use flags to mark entities as unactive,
--- we need to wait the frame ends until the entity get real destroyed.
+-- we need to wait the next frame until the entity get real destroyed.
 function Entity:destroy()
 	self.active = false
 end

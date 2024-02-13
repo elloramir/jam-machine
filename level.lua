@@ -38,4 +38,7 @@ function level.draw()
 	end
 end
 
+function level.debug()
+end
+
 return level

@@ -20,7 +20,7 @@ function Actor:new(x, y, w, h, ox, oy)
 	self.body_x = ox or 0
 	self.body_y = oy or 0
 	self.has_body = w and h
-	self.solid = false
+	self.solid = true
 	self.speed_x = 0
 	self.speed_y = 0
 	self.accum_x = 0
@@ -44,6 +44,20 @@ function Actor:set_image(image, speed)
 		self.frame_timer = 0
 		self.frame = 1
 	end
+end
+
+function Actor:is_mouse_over()
+	local mx, my = get_mouse()
+
+	return self:contains_point(mx, my)
+end
+
+function Actor:contains_point(x, y)
+	return
+		x >= self.x+self.body_x and
+		x <= self.x+self.body_x+self.body_w and
+		y >= self.y+self.body_y and
+		y <= self.y+self.body_y+self.body_h
 end
 
 function Actor:overlaps(other, ox, oy)
@@ -88,14 +102,18 @@ function Actor:move_x(dt)
 	local dir = sign(pixels)
 	self.accum_x = total-pixels
 
-	while pixels ~= 0 do
-		if not self:place_meeting(dir, 0) then
-			self.x = self.x+dir
-			pixels = pixels-dir
-		else
-			self.speed_x = -self.restitution*self.speed_x
-			break
+	if self.solid then
+		while pixels ~= 0 do
+			if not self:place_meeting(dir, 0) then
+				self.x = self.x+dir
+				pixels = pixels-dir
+			else
+				self.speed_x = -self.restitution*self.speed_x
+				break
+			end
 		end
+	else
+		self.x = self.x+pixels
 	end
 end
 
@@ -105,14 +123,18 @@ function Actor:move_y(dt)
 	local dir = sign(pixels)
 	self.accum_y = total-pixels
 
-	while pixels ~= 0 do
-		if not self:place_meeting(0, dir) then
-			self.y = self.y+dir
-			pixels = pixels-dir
-		else
-			self.speed_y = -self.restitution*self.speed_y
-			break
+	if self.solid then
+		while pixels ~= 0 do
+			if not self:place_meeting(0, dir) then
+				self.y = self.y+dir
+				pixels = pixels-dir
+			else
+				self.speed_y = -self.restitution*self.speed_y
+				break
+			end
 		end
+	else
+		self.y = self.y+pixels
 	end
 end
 
@@ -127,6 +149,7 @@ function Actor:update(dt)
 	if self.image and self.frame_speed > 0 then
 		self.frame_timer = self.frame_timer+dt
 		if self.frame_timer > self.frame_speed then
+			-- next frame
 			self.frame = self.frame+1
 			self.frame_timer = 0
 		end
