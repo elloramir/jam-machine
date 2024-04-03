@@ -1,7 +1,6 @@
 -- Copyright 2024 Elloramir.
 -- All rights over the code are reserved.
 
-local Image = require("image")
 local level = require("level")
 
 local dbug = false
@@ -10,12 +9,16 @@ local screen_scale = 1
 local screen_x = 0
 local screen_y = 0
 
--- get mouse position based on viewport
+-- @global
+function to_screen_space(x, y)
+	return
+		math.floor((x - screen_x) / screen_scale / camera.zoom + camera.x),
+		math.floor((y - screen_y) / screen_scale / camera.zoom + camera.y)
+end
+
+-- @global
 function get_mouse()
-	local mx, my = love.mouse.getPosition()
-	mx = (mx - screen_x) / screen_scale
-	my = (my - screen_y) / screen_scale
-	return mx, my
+	return to_screen_space(love.mouse.getPosition())
 end
 
 function love.load()
@@ -29,6 +32,7 @@ end
 function love.keypressed(key)
 	-- <TAB> toggle debug mode
 	if key == "tab" then dbug = not dbug end
+	if key == "escape" then love.event.quit() end
 end
 
 function love.update(dt)

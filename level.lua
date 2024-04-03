@@ -5,9 +5,13 @@ local level = {}
 
 function level.load()
 	level.entities = {}
+
+	level.add_entity("world")
 end
 
-function level.add_entity(en)
+function level.add_entity(name, ...)
+	local en = require("entities."..name)(...)
+	assert(en.active)
 	table.insert(level.entities, en)
 end
 

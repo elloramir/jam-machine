@@ -47,9 +47,7 @@ function Actor:set_image(image, speed)
 end
 
 function Actor:is_mouse_over()
-	local mx, my = get_mouse()
-
-	return self:contains_point(mx, my)
+	return self:contains_point(get_mouse())
 end
 
 function Actor:contains_point(x, y)

@@ -24,6 +24,8 @@ WIDTH = 640
 HEIGHT = 360
 SCALE = 1
 
+TILE_SIZE = 16
+
 function love.conf(t)
 	t.window.title = "sweeat heart"
 	t.window.width = WIDTH
