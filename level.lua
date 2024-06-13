@@ -5,14 +5,15 @@ local level = {}
 
 function level.load()
 	level.entities = {}
-
-	level.add_entity("world")
 end
 
 function level.add_entity(name, ...)
 	local en = require("entities."..name)(...)
+	-- the assert is necessary to check if the entity
+	-- the entity constructor has been called.
 	assert(en.active)
 	table.insert(level.entities, en)
+	return en
 end
 
 local function sort_entities(a, b)

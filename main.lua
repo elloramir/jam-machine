@@ -1,6 +1,7 @@
 -- Copyright 2024 Elloramir.
 -- All rights over the code are reserved.
 
+local assets = require("assets")
 local level = require("level")
 
 local dbug = false
@@ -26,6 +27,7 @@ function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
 	screen = love.graphics.newCanvas(WIDTH, HEIGHT)
 
+	assets.load()
 	level.load()
 end
 
