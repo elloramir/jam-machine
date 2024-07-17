@@ -53,9 +53,9 @@ end
 
 
 function Sprite:contains_point(x, y)
-    if not self.has_shape then
-        return false
-    end
+	if not self.has_shape then
+		return false
+	end
 
 	local x1 = self.x + (self.shape_ox or 0)
 	local y1 = self.y + (self.shape_oy or 0)

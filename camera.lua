@@ -16,33 +16,33 @@ camera.bound_h = math.huge
 
 
 function camera.set_bounds(x, y, w, h)
-    camera.bound_x = x
-    camera.bound_y = y
-    camera.bound_w = w
-    camera.bound_h = h
+	camera.bound_x = x
+	camera.bound_y = y
+	camera.bound_w = w
+	camera.bound_h = h
 end
 
 
 function camera.begin()
-    love.graphics.push()
-    love.graphics.translate(view.width/2, view.height/2)
-    love.graphics.scale(camera.zoom)
-    love.graphics.translate(
-        math.floor(-camera.x+0.5),
-        math.floor(-camera.y+0.5))
+	love.graphics.push()
+	love.graphics.translate(view.width/2, view.height/2)
+	love.graphics.scale(camera.zoom)
+	love.graphics.translate(
+		math.floor(-camera.x+0.5),
+		math.floor(-camera.y+0.5))
 end
 
 
 function camera.finish()
-    love.graphics.pop()
+	love.graphics.pop()
 end
 
 
 function camera.get_bounds()
-    return camera.x - view.width/2/camera.zoom,
-           camera.y - view.height/2/camera.zoom,
-           view.width/camera.zoom,
-           view.height/camera.zoom
+	return camera.x - view.width/2/camera.zoom,
+		   camera.y - view.height/2/camera.zoom,
+		   view.width/camera.zoom,
+		   view.height/camera.zoom
 end
 
 

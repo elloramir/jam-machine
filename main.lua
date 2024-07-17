@@ -6,21 +6,21 @@ local view = require("view")
 
 
 function love.load()
-    view.init()
-    game.init()
+	view.init()
+	game.init()
 end
 
 
 function love.resize(width, height)
-    view.resize(width, height)
+	view.resize(width, height)
 end
 
 
 function love.update(dt)
-    game.update(dt)
+	game.update(dt)
 end
 
 
 function love.draw()
-    game.draw()
+	game.draw()
 end

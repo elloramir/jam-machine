@@ -9,15 +9,15 @@ local Sheet = Object:extend()
 
 function Sheet:new(filename, fw, fh)
 	self.img = love.graphics.newImage(filename)
-    self.img:setFilter("nearest", "nearest")
+	self.img:setFilter("nearest", "nearest")
 
 	self.width = fw or self.img:getWidth()
 	self.height = fh or self.img:getHeight()
 	self.cols = self.img:getWidth()/self.width
 	self.rows = self.img:getHeight()/self.height
 
-    -- check if the image is divisible by the frame size.
-    -- This is a common mistake that can be hard to debug.
+	-- check if the image is divisible by the frame size.
+	-- This is a common mistake that can be hard to debug.
 	assert(self.img:getWidth()%self.width == 0)
 	assert(self.img:getHeight()%self.height == 0)
 
@@ -40,7 +40,7 @@ function Sheet:draw_index(index, x, y, px, py, r, sx, sy)
 	assert(index>0)
 
 	local fixed_index = (index-1)%#self.quads+1
-    local quad = self.quads[fixed_index]
+	local quad = self.quads[fixed_index]
 	local pivot_x = math.floor(self.width * (px or 0))
 	local pivot_y = math.floor(self.height * (py or 0))
 
