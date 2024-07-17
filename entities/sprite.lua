@@ -3,7 +3,10 @@
 
 local assets = require("assets")
 local Entity = require("entity")
+
+
 local Sprite = Entity:extend()
+
 
 function Sprite:new(x, y)
 	Entity.new(self)
@@ -22,6 +25,7 @@ function Sprite:new(x, y)
 	self.color = { 1, 1, 1, 1 }
 end
 
+
 function Sprite:set_image(image, speed)
 	if image ~= self.image then
 		self.image = image
@@ -32,6 +36,35 @@ function Sprite:set_image(image, speed)
 		self.frame_speed = speed
 	end
 end
+
+
+function Sprite:set_shape(w, h, ox, oy)
+	self.shape_w = w or self.image.width
+	self.shape_h = h or self.image.height
+	self.shape_ox = -math.floor((ox or 0.5) * self.shape_w)
+	self.shape_oy = -math.floor((oy or 0.5) * self.shape_h)
+	self.has_shape = true
+end
+
+
+function Sprite:corner()
+	return self.x + self.shape_ox, self.y + self.shape_oy
+end
+
+
+function Sprite:contains_point(x, y)
+    if not self.has_shape then
+        return false
+    end
+
+	local x1 = self.x + (self.shape_ox or 0)
+	local y1 = self.y + (self.shape_oy or 0)
+	local x2 = x1 + (self.shape_w or 0)
+	local y2 = y1 + (self.shape_h or 0)
+
+	return x >= x1 and x <= x2 and y >= y1 and y <= y2
+end
+
 
 function Sprite:update(dt)
 	-- update frame
@@ -45,19 +78,15 @@ function Sprite:update(dt)
 	end
 end
 
+
 function Sprite:draw()
-	-- the color should be propagate anyways, even if not visible,
-	-- because it should affect super calls bellow.
+	-- the color should be propagate anyways, even if it is not visible,
+	-- because it should affect things bellow the super call.
 	love.graphics.setColor(self.color)
 
-	-- ignore draw calls when it is not color visible and
-	-- when it hasn't an image.
+	-- ignore draw calls when it is not visible
 	if not self.image or self.color[4] == 0 then
 		return
-	end
-
-	if self.solid_color then
-		love.graphics.setShader(assets.shader_solid_color)
 	end
 
 	local x = self.x + self.offset_x
@@ -66,7 +95,7 @@ function Sprite:draw()
 	local scale_y = (self.flip_y and -1 or 1) * self.scale_y
 
 	self.image:draw_index(self.frame, x, y, self.pivot_x, self.pivot_y, self.rotation, scale_x, scale_y)
-	love.graphics.setShader(nil)
 end
+
 
 return Sprite
