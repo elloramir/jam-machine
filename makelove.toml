@@ -1,0 +1,8 @@
+love_version = "11.5"
+name = "Game"
+default_targets = ["lovejs", "win64"]
+build_directory = "dist"
+
+[lovejs]
+title = "Game"
+memory = "40000000"
