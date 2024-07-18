@@ -6,6 +6,8 @@ local view = require("view")
 
 
 function love.load()
+	math.randomseed(os.time())
+
 	view.init()
 	game.init()
 end

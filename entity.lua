@@ -51,4 +51,8 @@ function Entity:ui()
 end
 
 
+function Entity:destruct()
+end
+
+
 return Entity

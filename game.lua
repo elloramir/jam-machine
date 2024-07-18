@@ -2,9 +2,10 @@
 -- All rights over the code are reserved.
 
 local camera = require("camera")
+local input = require("input")
 local lume = require("libs.lume")
 local view = require("view")
-local world = require("world")
+local shash = require("libs.shash")
 
 
 local game = { }
@@ -13,7 +14,13 @@ local game = { }
 function game.init()
 	game.is_debug = false
 	game.entities = { }
-	game.world = world.new_world(64)
+	game.world = shash.new(64)
+
+	game.add_entity("actor", 0, 0):set_shape(100, 2)
+	game.add_entity("actor", 0, 0):set_shape(2, 100)
+
+
+	game.add_entity("player", 100, 100)
 end
 
 
@@ -40,9 +47,21 @@ end
 
 
 function game.update(dt)
+	input:update()
+
+	-- toggle debug mode
+	if input:pressed("debug") then
+		game.is_debug = not game.is_debug
+	end
+
+	if input:pressed("quit") then
+		love.event.quit()
+	end
+
 	for i, en in lume.ripairs(game.entities) do
 		if en.kill then
 			table.remove(game.entities, i)
+			en:destruct()
 		elseif en.active then
 			en:update(dt)
 		end
@@ -59,7 +78,7 @@ local function draw_info(txt, i)
 	local w = font:getWidth(txt) + 5
 	local h = font:getHeight() + 5
 
-	love.graphics.setColor(0, 0, 0, 0.8)
+	love.graphics.setColor(0, 0.2, 0.5)
 	love.graphics.rectangle("fill", 5, 5 + i * (h + 2), w, h, 3)
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.print(txt, 7, 7 + i * (h + 2))
@@ -68,7 +87,7 @@ end
 
 local function draw_world()
 	camera.begin()
-		local x, y, w, h = camera.get_bounds()
+		local x, y, w, h = camera.get_view()
 
 		for _, en in ipairs(game.entities) do
 			if en.visible and en:cull(x, y, w, h) then
@@ -82,7 +101,7 @@ end
 local function draw_ui()
 	for _, en in ipairs(game.entities) do
 		if en.visible then
-			en:draw_ui()
+			en:ui()
 		end
 	end
 end

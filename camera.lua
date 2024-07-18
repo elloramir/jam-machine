@@ -38,7 +38,7 @@ function camera.finish()
 end
 
 
-function camera.get_bounds()
+function camera.get_view()
 	return camera.x - view.width/2/camera.zoom,
 		   camera.y - view.height/2/camera.zoom,
 		   view.width/camera.zoom,

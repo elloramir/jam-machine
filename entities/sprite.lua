@@ -1,7 +1,7 @@
 -- Copyright 2024 Elloramir.
 -- All rights over the code are reserved.
 
-local assets = require("assets")
+local lume = require("libs.lume")
 local Entity = require("entity")
 
 
@@ -13,8 +13,6 @@ function Sprite:new(x, y)
 
 	self.x = x
 	self.y = y
-	self.offset_x = 0
-	self.offset_y = 0
 	self.flip_x = false
 	self.flip_y = false
 	self.pivot_x = 0.5
@@ -35,34 +33,6 @@ function Sprite:set_image(image, speed)
 	elseif speed and speed ~= self.frame_speed then
 		self.frame_speed = speed
 	end
-end
-
-
-function Sprite:set_shape(w, h, ox, oy)
-	self.shape_w = w or self.image.width
-	self.shape_h = h or self.image.height
-	self.shape_ox = -math.floor((ox or 0.5) * self.shape_w)
-	self.shape_oy = -math.floor((oy or 0.5) * self.shape_h)
-	self.has_shape = true
-end
-
-
-function Sprite:corner()
-	return self.x + self.shape_ox, self.y + self.shape_oy
-end
-
-
-function Sprite:contains_point(x, y)
-	if not self.has_shape then
-		return false
-	end
-
-	local x1 = self.x + (self.shape_ox or 0)
-	local y1 = self.y + (self.shape_oy or 0)
-	local x2 = x1 + (self.shape_w or 0)
-	local y2 = y1 + (self.shape_h or 0)
-
-	return x >= x1 and x <= x2 and y >= y1 and y <= y2
 end
 
 
@@ -89,12 +59,26 @@ function Sprite:draw()
 		return
 	end
 
-	local x = self.x + self.offset_x
-	local y = self.y + self.offset_y
+	local x = self.x
+	local y = self.y
 	local scale_x = (self.flip_x and -1 or 1) * self.scale_x
 	local scale_y = (self.flip_y and -1 or 1) * self.scale_y
 
 	self.image:draw_index(self.frame, x, y, self.pivot_x, self.pivot_y, self.rotation, scale_x, scale_y)
+end
+
+
+function Sprite:cull(x, y, w, h)
+	if not self.image then
+		return false
+	end
+
+	local x1 = self.x
+	local y1 = self.y
+	local x2 = x1 + self.image.width
+	local y2 = y1 + self.image.height
+
+	return x2 >= x and x1 <= x + w and y2 >= y and y1 <= y + h
 end
 
 
