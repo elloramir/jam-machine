@@ -1,7 +1,7 @@
 -- Copyright 2024 Elloramir.
 -- All rights over the code are reserved.
 
-local camera = require("camera")
+local assets = require("assets")
 local input = require("input")
 local lume = require("libs.lume")
 local view = require("view")
@@ -14,24 +14,19 @@ local game = { }
 function game.init()
 	game.is_debug = false
 	game.entities = { }
-	game.world = shash.new(64)
+	game.world = shash.new(32)
 
-	game.add_entity("actor", 0, 0):set_shape(100, 2)
-	game.add_entity("actor", 0, 0):set_shape(2, 100)
-
-
-	game.add_entity("player", 100, 100)
+	view.newLayer("2d", 320, 180)
 end
 
 
 -- because must all entities imports this file, we cannot
--- require them here, so it's more practical to read them
--- dynamically inside that function.
-function new_en(name, ...)
+-- require them here, so it's necessary to read them dynamically.
+local function new_en(name, ...)
 	local class = require("entities."..name)
-	local instn = class(...)
+	local instance = class(...)
 
-	return instn
+	return instance
 end
 
 
@@ -42,6 +37,10 @@ end
 
 
 local function sort_entities(a, b)
+	if a.should_sort_y and b.should_sort_y then
+		return (a:bottom() + a.order) < (b:bottom() + b.order)
+	end
+
 	return a.order < b.order
 end
 
@@ -50,26 +49,24 @@ function game.update(dt)
 	input:update()
 
 	-- toggle debug mode
-	if input:pressed("debug") then
+	if ENV_DEV and input:pressed("debug") then
 		game.is_debug = not game.is_debug
 	end
 
-	if input:pressed("quit") then
+	if ENV_DEV and input:pressed("quit") then
 		love.event.quit()
 	end
 
 	for i, en in lume.ripairs(game.entities) do
-		if en.kill then
+		if not en.is_alive then
 			table.remove(game.entities, i)
 			en:destruct()
-		elseif en.active then
+		elseif en.is_active then
 			en:update(dt)
 		end
 	end
 
-	if math.random() > 0.5 then
-		table.sort(game.entities, sort_entities)
-	end
+	table.sort(game.entities, sort_entities)
 end
 
 
@@ -78,7 +75,7 @@ local function draw_info(txt, i)
 	local w = font:getWidth(txt) + 5
 	local h = font:getHeight() + 5
 
-	love.graphics.setColor(0, 0.2, 0.5)
+	love.graphics.setColor(num_to_color(i))
 	love.graphics.rectangle("fill", 5, 5 + i * (h + 2), w, h, 3)
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.print(txt, 7, 7 + i * (h + 2))
@@ -86,42 +83,26 @@ end
 
 
 local function draw_world()
-	camera.begin()
-		local x, y, w, h = camera.get_view()
-
-		for _, en in ipairs(game.entities) do
-			if en.visible and en:cull(x, y, w, h) then
-				en:draw()
-			end
-		end
-	camera.finish()
-end
-
-
-local function draw_ui()
 	for _, en in ipairs(game.entities) do
-		if en.visible then
-			en:ui()
+		if en.is_visible then
+			en:draw()
 		end
 	end
 end
 
 
 function game.draw()
-	view.begin()
-		view.child(200, 200, draw_world)
-		view.child(700, 400, draw_ui)
-	view.finish()
+	view.bind("2d", draw_world)
 
 	-- debug info
 	if game.is_debug then
 		local status = love.graphics.getStats()
 
-		draw_info("fps: " .. love.timer.getFPS(), 0)
-		draw_info("entities: " .. #game.entities, 1)
-		draw_info(string.format("sys_mem: %.2fmb", collectgarbage("count")/1024), 2)
-		draw_info(string.format("tex_mem: %.2fmb", status.texturememory/1048576), 3)
-		draw_info("dwr: " .. status.drawcalls, 4)
+		draw_info(string.format("fps: %d", love.timer.getFPS()), 0)
+		draw_info(string.format("entities: %d", #game.entities), 1)
+		draw_info(string.format("sys mem: %.2fmb", collectgarbage("count")/1024), 2)
+		draw_info(string.format("tex mem: %.2fmb", status.texturememory/1048576), 3)
+		draw_info(string.format("drawcalls: %d", status.drawcalls), 4)
 	end
 end
 

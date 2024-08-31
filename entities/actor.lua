@@ -5,6 +5,9 @@ local game = require("game")
 local lume = require("libs.lume")
 local Sprite = require("entities.sprite")
 
+
+-- yes, it's a "god class" like, since we can have
+-- actors that are not showing nothing on the screen. 
 local Actor = Sprite:extend()
 
 
@@ -20,10 +23,10 @@ end
 
 
 function Actor:set_shape(w, h, ox, oy)
-	self.shape_w = w or self.image.width
-	self.shape_h = h or self.image.height
-	self.shape_ox = -math.floor((ox or 0.5) * self.shape_w)
-	self.shape_oy = -math.floor((oy or 0.5) * self.shape_h)
+	self.width = w
+	self.height = h
+	self.offset_x = math.floor((ox or 0.5) * w)
+	self.offset_y = math.floor((oy or 0.5) * h)
 	self.has_shape = true
 
     game.world:add(self, self:shape())
@@ -40,22 +43,24 @@ function Actor:contains_point(x, y)
 		return false
 	end
 
-	local x1 = self.x + (self.shape_ox or 0)
-	local y1 = self.y + (self.shape_oy or 0)
-	local x2 = x1 + (self.shape_w or 0)
-	local y2 = y1 + (self.shape_h or 0)
+	local x1, y1, x2, y2 = self:points()
 
 	return x >= x1 and x <= x2 and y >= y1 and y <= y2
 end
 
 
+function Actor:points()
+	return self.x, self.y, self.x + self.width, self.y + self.height
+end
+
+
 function Actor:corner()
-	return self.x + self.shape_ox, self.y + self.shape_oy
+	return self.x, self.y
 end
 
 
 function Actor:shape()
-    return self.x + self.shape_ox, self.y + self.shape_oy, self.shape_w, self.shape_h
+	return self.x, self.y, self.width, self.height
 end
 
 
@@ -113,18 +118,6 @@ function Actor:resolve_mtv(other)
 		self.speed_y = self.speed_y * self.restitution
 		self.normal_y = dy > 0 and 1 or -1
 	end
-end
-
-
-function Actor:cull(x, y, w, h)
-	local visible = Actor.super.cull(self, x, y, w, h)
-
-	if not visible and self.has_shape then
-		local x1, y1, w1, h1 = self:shape()
-		visible = x1 < x + w and x1 + w1 > x and y1 < y + h and y1 + h1 > y
-	end
-
-	return visible
 end
 
 

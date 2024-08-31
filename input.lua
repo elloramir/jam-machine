@@ -6,13 +6,13 @@ local baton = require("libs.baton")
 
 return baton.new {
     controls = {
-        debug = { "key:tab" },
-        quit = { "key:escape" },
+        debug  = { "key:tab" },
+        quit   = { "key:escape" },
 
-        left = {'key:left', 'key:a', 'axis:leftx-', 'button:dpleft'},
-        right = {'key:right', 'key:d', 'axis:leftx+', 'button:dpright'},
-        up = {'key:up', 'key:w', 'axis:lefty-', 'button:dpup'},
-        down = {'key:down', 'key:s', 'axis:lefty+', 'button:dpdown'},
-        action = {'key:x', 'button:a'},
+        left   = {"key:left", "key:a", "axis:leftx-", "button:dpleft"},
+        right  = {"key:right", "key:d", "axis:leftx+", "button:dpright"},
+        up     = {"key:up", "key:w", "axis:lefty-", "button:dpup"},
+        down   = {"key:down", "key:s", "axis:lefty+", "button:dpdown"},
+        action = {"key:x", "button:a"},
     }
 }
