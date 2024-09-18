@@ -8,10 +8,10 @@ local Entity = Object:extend()
 
 
 function Entity:new(order)
-	self.created_at = love.timer.getTime() / 1e9
-	self.is_alive = true -- delete this entity in the next frame
-	self.is_visible = true -- ignore this entity in the draw loop
-	self.is_active = true -- ignore this entity in the update loop
+    self.created_at = love.timer.getTime() / 1e7
+    self.is_alive = true -- delete this entity in the next frame
+    self.is_visible = true -- ignore this entity in the draw loop
+    self.is_active = true -- ignore this entity in the update loop
 
     -- linked list used to search entities
     if not self.__index.first then
@@ -23,33 +23,33 @@ function Entity:new(order)
         self.__index.last = self
     end
 
-	self:set_order(order or 0)
+    self:set_order(order or 0)
 end
 
 
 function Entity:enable_sort_y()
-	self.should_sort_y = true
+    self.should_sort_y = true
 end
 
 
 -- this function is used on the y-sort
 function Entity:bottom()
-	error("not overriden")
+    error("not overriden")
 end
 
 
 function Entity:set_order(order)
-	self.order = order + self.created_at
+    self.order = order + self.created_at
 end
 
 
 local function iter(self, current)
-	return current.right
+    return current.right
 end
 
 
 function Entity:iter()
-	return iter, self.__index.first
+    return iter, self.__index.first
 end
 
 
@@ -58,20 +58,20 @@ end
 -- There are cases where the entity is flagged as "kill" before it execution,
 -- so in that case the entity will be destroyed at same frame. 
 function Entity:destroy()
-	self.is_alive = false
+    self.is_alive = false
 
-	-- update linked list
-	if self.left then
-		self.left.right = self.right
-	else
-		self.__index.first = self.right
-	end
+    -- update linked list
+    if self.left then
+        self.left.right = self.right
+    else
+        self.__index.first = self.right
+    end
 
-	if self.right then
-		self.right.left = self.left
-	else
-		self.__index.last = self.left
-	end
+    if self.right then
+        self.right.left = self.left
+    else
+        self.__index.last = self.left
+    end
 end
 
 
@@ -79,28 +79,54 @@ end
 -- It's important to note that we only create the table when the first
 -- subscriber is added, this way we save memory in lua.
 function Entity:emit(event, ...)
-	if self.subscribers then
-		local subs = self.subscribers[event]
+    if self.subscribers then
+        local subs = self.subscribers[event]
 
-		if subs then
-			for _, callback in ipairs(subs) do
-				callback(self, ...)
-			end
-		end
-	end
+        if subs then
+            for k, callback in ipairs(subs) do
+                -- unsubscribe if return true
+                if callback(self, ...) then
+                    subs[k] = nil
+                end
+            end
+        end
+    end
 end
 
 
 function Entity:on(event, callback)
-	if not self.subscribers then
-		self.subscribers = { }
+    if not self.subscribers then
+        self.subscribers = { }
+    end
+
+    if not self.subscribers[event] then
+        self.subscribers[event] = { }
+    end
+
+    table.insert(self.subscribers[event], callback)
+end
+
+
+function Entity:add_tag(...)
+	if not self.tags then
+		self.tags = { }
 	end
 
-	if not self.subscribers[event] then
-		self.subscribers[event] = { }
+	for i = 1, select("#", ...) do
+		local name = select(i, ...)
+	
+		self.tags[name] = true
+	end
+end
+
+
+-- @note: we are overriden the original function
+function Entity:is(tag_name)
+	if not self.tags then
+		return false
 	end
 
-	table.insert(self.subscribers[event], callback)
+	return self.tags[tag_name]
 end
 
 
@@ -109,6 +135,10 @@ end
 
 
 function Entity:draw()
+end
+
+
+function Entity:debug()
 end
 
 

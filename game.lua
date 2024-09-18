@@ -37,11 +37,11 @@ end
 
 
 local function sort_entities(a, b)
-	if a.should_sort_y and b.should_sort_y then
-		return (a:bottom() + a.order) < (b:bottom() + b.order)
-	end
+    if a.should_sort_y and b.should_sort_y then
+        return (a:bottom() + a.order) < (b:bottom() + b.order)
+    end
 
-	return a.order < b.order
+    return a.order < b.order
 end
 
 

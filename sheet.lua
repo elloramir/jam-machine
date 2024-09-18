@@ -10,7 +10,6 @@ local Sheet = Object:extend()
 
 function Sheet:new(filename, fw, fh)
 	self.img = love.graphics.newImage(filename)
-	self.img:setFilter("nearest", "nearest")
 
 	self.width = fw or self.img:getWidth()
 	self.height = fh or self.img:getHeight()

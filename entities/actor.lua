@@ -2,133 +2,145 @@
 -- All rights over the code are reserved.
 
 local game = require("game")
-local lume = require("libs.lume")
-local Sprite = require("entities.sprite")
+local entity = require("entity")
 
 
--- yes, it's a "god class" like, since we can have
--- actors that are not showing nothing on the screen. 
-local Actor = Sprite:extend()
+local Sprite = entity:extend()
 
 
-function Actor:new(x, y)
-    Actor.super.new(self, x, y)
+function Sprite:new(x, y)
+    Sprite.super.new(self)
 
-    self.speed_x = 0
-    self.speed_y = 0
-    self.restitution = 0
-    self.normal_x = 0
-    self.normal_y = 0
+    self.x = x
+    self.y = y
+    self.offset_x = 0
+    self.offset_y = 0
+    self.flip_x = false
+    self.flip_y = false
+    self.pivot_x = 0.5
+    self.pivot_y = 0.5
+    self.scale_x = 1
+    self.scale_y = 1
+    self.rotation = 0
+    self.color = { 1, 1, 1, 1 }
 end
 
 
-function Actor:set_shape(w, h, ox, oy)
-	self.width = w
-	self.height = h
-	self.offset_x = math.floor((ox or 0.5) * w)
-	self.offset_y = math.floor((oy or 0.5) * h)
-	self.has_shape = true
+-- visual bottom of the sprite
+function Sprite:bottom()
+    local height = self.image.height * self.scale_y
+    local pivot = self.image.height * self.pivot_y * self.scale_y
 
-    game.world:add(self, self:shape())
+    return self.y + self.offset_y + height - pivot
 end
 
 
-function Actor:destruct()
-    game.world:remove(self)
+function Sprite:image_body()
+	local x1, y1, x2, y2 = self:image_points()
+	
+	return x1, y1, (x2 - x1), (y2 - y1)
 end
 
 
-function Actor:contains_point(x, y)
-	if not self.has_shape then
-		return false
-	end
-
-	local x1, y1, x2, y2 = self:points()
-
-	return x >= x1 and x <= x2 and y >= y1 and y <= y2
+function Sprite:set_pivot(x, y)
+    self.pivot_x = x or self.pivot_x
+    self.pivot_y = y or self.pivot_y
 end
 
 
-function Actor:points()
-	return self.x, self.y, self.x + self.width, self.y + self.height
+function Sprite:image_points()
+    local x1 = self.x + self.offset_x - self.image.width * self.pivot_x * self.scale_x
+    local y1 = self.y + self.offset_y - self.image.height * self.pivot_y * self.scale_y
+    local x2 = x1 + self.image.width * self.scale_x
+    local y2 = y1 + self.image.height * self.scale_y
+
+    return x1, y1, x2, y2
 end
 
 
-function Actor:corner()
-	return self.x, self.y
+function Sprite:image_overlaps(x3, y3, x4, y4)
+    local x1, y1, x2, y2 = self:image_points()
+
+    return x1 < x4 and x2 > x3 and y1 < y4 and y2 > y3
 end
 
 
-function Actor:shape()
-	return self.x, self.y, self.width, self.height
+function Sprite:set_image(image, speed, first, last, once)
+    if image ~= self.image then
+        self.image = image
+        self.frame_timer = 0
+        self.frame = first or 1
+    end
+
+    self.play_once = once
+    self.frame_speed = speed or 0
+    self.frame_start = first or 1
+    self.frame_end = last or image:frames_count()
 end
 
 
-function Actor.filter(other, self)
-	if other:is(Actor) then
-		self:resolve_mtv(other)
-	end
+function Sprite:set_random_frame()
+    self.frame = math.random(self.frame_start, self.frame_end)
 end
 
 
-function Actor:move(dt)
-	if self.speed_x == 0 and self.speed_y == 0 then
-		return
-	end
-
-	self.normal_x = 0
-	self.normal_y = 0
-
-	self.x = self.x + self.speed_x * dt
-	self.y = self.y + self.speed_y * dt
-
-	game.world:update(self, self:shape())
-	game.world:each(self, self.filter, self)
+function Sprite:restore_scale(spd, dt)
+    self.scale_x = lerpf(self.scale_x, 1, spd * dt)
+    self.scale_y = lerpf(self.scale_y, 1, spd * dt)
 end
 
 
--- smallest vector that can be applied to
--- separate two overlapping rectangles
-function Actor:resolve_mtv(other)
-	local x1, y1, w1, h1 = self:shape()
-	local x2, y2, w2, h2 = other:shape()
-
-	local dx = x1 + w1/2 - x2 - w2/2
-	local dy = y1 + h1/2 - y2 - h2/2
-
-	local ox = w1/2 + w2/2 - math.abs(dx)
-	local oy = h1/2 + h2/2 - math.abs(dy)
-
-	if ox < oy then
-		if dx > 0 then
-			self.x = self.x + ox
-		else
-			self.x = self.x - ox
-		end
-
-		self.speed_x = self.speed_x * self.restitution
-		self.normal_x = dx > 0 and 1 or -1
-	else
-		if dy > 0 then
-			self.y = self.y + oy
-		else
-			self.y = self.y - oy
-		end
-
-		self.speed_y = self.speed_y * self.restitution
-		self.normal_y = dy > 0 and 1 or -1
-	end
+function Sprite:set_scale(x, y)
+    self.scale_x = x or self.scale_x
+    self.scale_y = y or self.scale_y
 end
 
 
-function Actor:draw()
-	Actor.super.draw(self)
-
-	if game.is_debug and self.has_shape then
-		love.graphics.setColor(1, 0, 0)
-		love.graphics.rectangle("line", self:shape())
-	end
+function Sprite:update(dt)
+    -- update frame
+    if self.image and self.frame_speed > 0 then
+        self.frame_timer = self.frame_timer + dt
+        if self.frame_timer > self.frame_speed then
+            -- next frame
+            self.frame = (self.frame + 1)
+            self.frame_timer = 0
+            -- last frame reached
+            if self.frame > self.frame_end then
+                -- if should play once, then stopped it at the end
+                if self.play_once then
+                    self.frame_speed = 0
+                    self.frame = self.frame_end
+                else
+                    -- back to beginning
+                    self.frame = self.frame_start
+                end
+            end
+        end
+    end
 end
 
 
-return Actor
+function Sprite:draw()
+    -- the color should be propagate anyways, even if it is not visible,
+    -- because it should affect things bellow the super call.
+    love.graphics.setColor(self.color)
+
+    -- ignore draw calls when it is not visible
+    if not self.image or self.color[4] == 0 then
+        return
+    end
+
+    local x = self.x + self.offset_x
+    local y = self.y + self.offset_y
+    local scale_x = (self.flip_x and -1 or 1) * self.scale_x
+    local scale_y = (self.flip_y and -1 or 1) * self.scale_y
+
+    self.image:draw_index(self.frame, x, y, self.pivot_x, self.pivot_y, self.rotation, scale_x, scale_y)
+end
+
+
+function Sprite:debug()
+end
+
+
+return Sprite
