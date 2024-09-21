@@ -15,11 +15,11 @@ function Player:new(x, y)
     self:set_order(100)
 
     self:on("body_enter", function()
-        -- print("entered")
+        print("entered")
     end)
 
     self:on("body_exit", function()
-        -- print("exited")
+        print("exited")
     end)
 end
 

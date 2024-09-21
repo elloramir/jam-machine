@@ -20,7 +20,7 @@ function game.init()
 
     game.add_entity("player", 0, 0)
 
-    for i = 1, 1000 do
+    for i = 1, 2 do
         local x = math.random(0, 320)
         local y = math.random(0, 180)
 
