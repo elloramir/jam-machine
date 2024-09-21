@@ -10,27 +10,27 @@ local view = require("view")
 
 
 function love.load()
-	math.randomseed(os.time())
+    math.randomseed(os.time())
 
-	love.graphics.setDefaultFilter("nearest", "nearest")
-	love.graphics.setLineStyle("rough")
+    love.graphics.setDefaultFilter("nearest", "nearest")
+    love.graphics.setLineStyle("rough")
 
-	assets.init()
-	view.init()
-	game.init()
+    assets.init()
+    view.init()
+    game.init()
 end
 
 
 function love.resize(width, height)
-	view.resize(width, height)
+    view.resize(width, height)
 end
 
 
 function love.update(dt)
-	game.update(dt)
+    game.update(dt)
 end
 
 
 function love.draw()
-	game.draw()
+    game.draw()
 end

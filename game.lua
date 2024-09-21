@@ -12,27 +12,36 @@ local game = { }
 
 
 function game.init()
-	game.is_debug = false
-	game.entities = { }
-	game.world = shash.new(32)
+    game.is_debug = false
+    game.entities = { }
+    game.world = shash.new(32)
 
-	view.newLayer("2d", 320, 180)
+    view.newLayer("2d", 320, 180)
+
+    game.add_entity("player", 0, 0)
+
+    for i = 1, 1000 do
+        local x = math.random(0, 320)
+        local y = math.random(0, 180)
+
+        game.add_entity("test", x, y):set_shape(32, 32)
+    end
 end
 
 
 -- because must all entities imports this file, we cannot
 -- require them here, so it's necessary to read them dynamically.
 local function new_en(name, ...)
-	local class = require("entities."..name)
-	local instance = class(...)
+    local class = require("entities."..name)
+    local instance = class(...)
 
-	return instance
+    return instance
 end
 
 
 function game.add_entity(en, ...)
-	en = type(en) == "string" and new_en(en, ...) or en
-	return lume.push(game.entities, en)
+    en = type(en) == "string" and new_en(en, ...) or en
+    return lume.push(game.entities, en)
 end
 
 
@@ -46,64 +55,68 @@ end
 
 
 function game.update(dt)
-	input:update()
+    input:update()
 
-	-- toggle debug mode
-	if ENV_DEV and input:pressed("debug") then
-		game.is_debug = not game.is_debug
-	end
+    -- toggle debug mode
+    if ENV_DEV and input:pressed("debug") then
+        game.is_debug = not game.is_debug
+    end
 
-	if ENV_DEV and input:pressed("quit") then
-		love.event.quit()
-	end
+    if ENV_DEV and input:pressed("quit") then
+        love.event.quit()
+    end
 
-	for i, en in lume.ripairs(game.entities) do
-		if not en.is_alive then
-			table.remove(game.entities, i)
-			en:destruct()
-		elseif en.is_active then
-			en:update(dt)
-		end
-	end
+    for i, en in lume.ripairs(game.entities) do
+        if not en.is_alive then
+            table.remove(game.entities, i)
+            en:destruct()
+        elseif en.is_active then
+            en:update(dt)
+        end
+    end
 
-	table.sort(game.entities, sort_entities)
+    table.sort(game.entities, sort_entities)
 end
 
 
 local function draw_info(txt, i)
-	local font = love.graphics.getFont()
-	local w = font:getWidth(txt) + 5
-	local h = font:getHeight() + 5
+    local font = love.graphics.getFont()
+    local w = font:getWidth(txt) + 5
+    local h = font:getHeight() + 5
 
-	love.graphics.setColor(num_to_color(i))
-	love.graphics.rectangle("fill", 5, 5 + i * (h + 2), w, h, 3)
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.print(txt, 7, 7 + i * (h + 2))
+    love.graphics.setColor(num_to_color(i))
+    love.graphics.rectangle("fill", 5, 5 + i * (h + 2), w, h, 3)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print(txt, 7, 7 + i * (h + 2))
 end
 
 
 local function draw_world()
-	for _, en in ipairs(game.entities) do
-		if en.is_visible then
-			en:draw()
-		end
-	end
+    for _, en in ipairs(game.entities) do
+        if en.is_visible then
+            en:draw()
+            -- @todo: separated pass for debug?
+            if game.is_debug then
+                en:debug()
+            end
+        end
+    end
 end
 
 
 function game.draw()
-	view.bind("2d", draw_world)
+    view.bind("2d", draw_world)
 
-	-- debug info
-	if game.is_debug then
-		local status = love.graphics.getStats()
+    -- debug info
+    if game.is_debug then
+        local status = love.graphics.getStats()
 
-		draw_info(string.format("fps: %d", love.timer.getFPS()), 0)
-		draw_info(string.format("entities: %d", #game.entities), 1)
-		draw_info(string.format("sys mem: %.2fmb", collectgarbage("count")/1024), 2)
-		draw_info(string.format("tex mem: %.2fmb", status.texturememory/1048576), 3)
-		draw_info(string.format("drawcalls: %d", status.drawcalls), 4)
-	end
+        draw_info(string.format("fps: %d", love.timer.getFPS()), 0)
+        draw_info(string.format("entities: %d", #game.entities), 1)
+        draw_info(string.format("sys mem: %.2fmb", collectgarbage("count")/1024), 2)
+        draw_info(string.format("tex mem: %.2fmb", status.texturememory/1048576), 3)
+        draw_info(string.format("drawcalls: %d", status.drawcalls), 4)
+    end
 end
 
 

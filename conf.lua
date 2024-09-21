@@ -19,9 +19,9 @@
 ENV_DEV = true
 
 function love.conf(t)
-	t.window.title = ""
-	t.window.width = 960
-	t.window.height = 540
-	t.window.vsync = false
-	t.window.resizable = true
+    t.window.title = ""
+    t.window.width = 960
+    t.window.height = 540
+    t.window.vsync = false
+    t.window.resizable = true
 end

@@ -108,25 +108,25 @@ end
 
 
 function Entity:add_tag(...)
-	if not self.tags then
-		self.tags = { }
-	end
+    if not self.tags then
+        self.tags = { }
+    end
 
-	for i = 1, select("#", ...) do
-		local name = select(i, ...)
-	
-		self.tags[name] = true
-	end
+    for i = 1, select("#", ...) do
+        local name = select(i, ...)
+    
+        self.tags[name] = true
+    end
 end
 
 
 -- @note: we are overriden the original function
 function Entity:is(tag_name)
-	if not self.tags then
-		return false
-	end
+    if not self.tags then
+        return false
+    end
 
-	return self.tags[tag_name]
+    return self.tags[tag_name]
 end
 
 
