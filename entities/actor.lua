@@ -15,9 +15,8 @@ local Actor = Sprite:extend()
 function Actor:new(x, y)
     Actor.super.new(self, x, y)
 
-    self:add_tag("actor")
+    self:set_tag("actor")
 
-    self.is_solid = true
     self.speed_x = 0
     self.speed_y = 0
     self.restitution = 0
@@ -26,14 +25,23 @@ function Actor:new(x, y)
 end
 
 
-function Actor:set_shape(w, h, ox, oy)
+function Actor:set_shape(w, h, ox, oy, is_solid)
     self.width = w
     self.height = h
     self.offset_x = math.floor((ox or 0.5) * w)
     self.offset_y = math.floor((oy or 0.5) * h)
     self.has_shape = true
+    self.is_solid = is_solid == nil and true or is_solid
 
     game.world:add(self, self:shape())
+end
+
+
+function Actor:set_position(x, y)
+    if x ~= self.x or y ~= self.y then
+        self.x, self.y = x, y
+        self:update_body()
+    end
 end
 
 
@@ -99,18 +107,21 @@ function Actor:overlaps(x3, y3, x4, y4)
 end
 
 
+function Actor:is_moving()
+    return self.speed_x ~= 0 or self.speed_y ~= 0
+end
+
+
 function Actor:move(dt)
-    if self.speed_x == 0 and self.speed_y == 0 then
-        return
+    if self:is_moving() then
+        self.normal_x = 0
+        self.normal_y = 0
+
+        self.x = self.x + self.speed_x * dt
+        self.y = self.y + self.speed_y * dt
+
+        self:update_body()
     end
-
-    self.normal_x = 0
-    self.normal_y = 0
-
-    self.x = self.x + self.speed_x * dt
-    self.y = self.y + self.speed_y * dt
-
-    self:update_body()
 end
 
 

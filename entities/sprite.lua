@@ -1,6 +1,7 @@
 -- Copyright 2024 Elloramir.
 -- All rights over the code are reserved.
 
+local assets = require("assets")
 local game = require("game")
 local entity = require("entity")
 
@@ -26,9 +27,21 @@ function Sprite:new(x, y)
 end
 
 
+function Sprite:set_position(x, y)
+    self.x, self.y = x, y
+end
+
+
 -- visual bottom of the sprite
 function Sprite:bottom()
-    return self.y + self.pivot_y * self.image.height
+    if not self.image then
+        return self.y
+    end
+
+    local height = self.image.height * self.scale_y
+    local pivot = self.image.height * self.pivot_y * self.scale_y
+
+    return self.y + self.offset_y + height - pivot
 end
 
 
@@ -38,7 +51,34 @@ function Sprite:set_pivot(x, y)
 end
 
 
-function Sprite:set_image(image, speed, first, last, once)
+function Sprite:image_points()
+    local x1 = self.x + self.offset_x - self.image.width * self.pivot_x * self.scale_x
+    local y1 = self.y + self.offset_y - self.image.height * self.pivot_y * self.scale_y
+    local x2 = x1 + self.image.width * self.scale_x
+    local y2 = y1 + self.image.height * self.scale_y
+
+    return x1, y1, x2, y2
+end
+
+
+function Sprite:image_body()
+    local x1, y1, x2, y2 = self:image_points()
+    
+    return x1, y1, (x2 - x1), (y2 - y1)
+end
+
+
+function Sprite:image_overlaps(x3, y3, x4, y4)
+    local x1, y1, x2, y2 = self:image_points()
+
+    return x1 < x4 and x2 > x3 and y1 < y4 and y2 > y3
+end
+
+
+function Sprite:set_image(image_name, speed, first, last, once)
+    local image = assets.get(image_name)
+    assert(image)
+
     if image ~= self.image then
         self.image = image
         self.frame_timer = 0
@@ -48,7 +88,17 @@ function Sprite:set_image(image, speed, first, last, once)
     self.play_once = once
     self.frame_speed = speed or 0
     self.frame_start = first or 1
-    self.frame_end = last or image:frames()
+    self.frame_end = last or image:frames_count()
+end
+
+
+function Sprite:set_frame(index)
+    self.frame = index
+end
+
+
+function Sprite:set_random_frame()
+    self.frame = math.random(self.frame_start, self.frame_end)
 end
 
 
@@ -104,6 +154,11 @@ function Sprite:draw()
     local scale_y = (self.flip_y and -1 or 1) * self.scale_y
 
     self.image:draw_index(self.frame, x, y, self.pivot_x, self.pivot_y, self.rotation, scale_x, scale_y)
+end
+
+
+function Sprite:cull(x, y, w, h)
+    return self:image_overlaps(x, y, x+w, y+h)
 end
 
 
