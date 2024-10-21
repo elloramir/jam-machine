@@ -2,7 +2,9 @@
 -- All rights over the code are reserved.
 
 local input = require("input")
+local Emitter = require("entities.emitter")
 local Actor = require("entities.actor")
+
 
 local Player = Actor:extend()
 
@@ -10,30 +12,39 @@ local Player = Actor:extend()
 function Player:new(x, y)
     Player.super.new(self, x, y)
 
-    self.is_solid = false
-    self:set_shape(32, 32)
-    self:set_order(100)
+    self:set_tag("player")
+    self:set_order(ORDER_SIMS)
+    self:set_image("sprites/player")
+    self:set_pivot(0.5, 1)
+    self:set_shape(16, 16, 0.5, 1)
 
-    self:on("body_enter", function()
-        print("entered")
-    end)
-
-    self:on("body_exit", function()
-        print("exited")
-    end)
+    self.max_move_speed = 150
+    self.max_fall_speed = 500
+    self.gravity = 1000
+    self.jump_speed = 300
 end
 
 
 function Player:update(dt)
-    local dx, dy = 0, 0
+    Player.super.update(self, dt)
 
-    if input:down("left") then dx = dx - 1 end
-    if input:down("right") then dx = dx + 1 end
-    if input:down("up") then dy = dy - 1 end
-    if input:down("down") then dy = dy + 1 end
+    -- horizontal movement
+    do
+        local dx = 0
 
-    self.speed_x = dx * 100
-    self.speed_y = dy * 100
+        if input:down("left") then dx = dx - 1 end
+        if input:down("right") then dx = dx + 1 end
+
+        self.speed_x = dx * self.max_move_speed
+    end
+
+    -- gravity
+    self.speed_y = approach(self.speed_y, self.max_fall_speed, self.gravity * dt)
+
+    -- jump control
+    if input:pressed("jump") and self:is_grounded() then
+        self.speed_y = -self.jump_speed
+    end
 
     self:move(dt)
 end

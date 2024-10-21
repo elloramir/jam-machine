@@ -52,6 +52,10 @@ end
 
 
 function Sprite:image_points()
+    if not self.image then
+        return self.x, self.y, self.x, self.y
+    end
+
     local x1 = self.x + self.offset_x - self.image.width * self.pivot_x * self.scale_x
     local y1 = self.y + self.offset_y - self.image.height * self.pivot_y * self.scale_y
     local x2 = x1 + self.image.width * self.scale_x

@@ -49,7 +49,7 @@ function assets.init()
             end
             
             assets.loaded[name] = Sheet(file, w, h)
-        elseif ext == "tmj" then
+        elseif ext == "tmj" or ext == "json" then
             local content = love.filesystem.read(file)
             local decoded = json.decode(content)
 

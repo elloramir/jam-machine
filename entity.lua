@@ -13,16 +13,6 @@ function Entity:new(order)
     self.is_visible = true -- ignore this entity in the draw loop
     self.is_active = true -- ignore this entity in the update loop
 
-    -- linked list used to search entities
-    if not self.__index.first then
-        self.__index.first = self
-        self.__index.last = self
-    else
-        self.__index.last.right = self
-        self.left = self.__index.last
-        self.__index.last = self
-    end
-
     self:set_order(order or 0)
 end
 
@@ -32,7 +22,13 @@ function Entity:enable_sort_y()
 end
 
 
--- this function is used on the y-sort
+function Entity:mark_as_ui()
+    self.is_ui = true
+end
+
+
+-- this function is used on the y-sort. If you enable the y-sort
+-- and you don't have that function overrided, the game will intentionally crash.
 function Entity:bottom()
     error("not overriden")
 end
@@ -43,35 +39,12 @@ function Entity:set_order(order)
 end
 
 
-local function iter(self, current)
-    return current.right
-end
-
-
-function Entity:iter()
-    return iter, self.__index.first
-end
-
-
 -- since we use flags to mark entities as unactive,
 -- we need to wait the next frame until the entity get real destroyed.
 -- There are cases where the entity is flagged as "kill" before it execution,
 -- so in that case the entity will be destroyed at same frame. 
 function Entity:destroy()
     self.is_alive = false
-
-    -- update linked list
-    if self.left then
-        self.left.right = self.right
-    else
-        self.__index.first = self.right
-    end
-
-    if self.right then
-        self.right.left = self.left
-    else
-        self.__index.last = self.left
-    end
 end
 
 
@@ -107,7 +80,7 @@ function Entity:on(event, callback)
 end
 
 
-function Entity:add_tag(...)
+function Entity:set_tag(...)
     if not self.tags then
         self.tags = { }
     end
@@ -120,14 +93,14 @@ function Entity:add_tag(...)
 end
 
 
--- @note: we are overriden the original function
-function Entity:is(tag_name)
+function Entity:are(tag_name)
     if not self.tags then
         return false
     end
 
     return self.tags[tag_name]
 end
+
 
 
 function Entity:update(dt)
@@ -144,5 +117,18 @@ end
 
 function Entity:destruct()
 end
+
+
+-- this is an hack to group entities
+-- based on their inheritance.
+function Entity:extend()
+    return Entity.super.extend(self)
+end
+
+
+function Entity:cull(x, y, w, h)
+    return true
+end
+
 
 return Entity

@@ -1,7 +1,7 @@
 -- Copyright 2024 Elloramir.
 -- All rights over the code are reserved.
 
-function num_to_color(i)
+function num_to_color(i, a)
     local v = 1610612741
 
     v = (v * i) % 0xFFFFFF
@@ -13,7 +13,7 @@ function num_to_color(i)
     local g = (math.floor(v / 0x100) % 0x100) / 255
     local b = (v % 0x100) / 255
 
-    return r, g, b
+    return r, g, b, (a or 1)
 end
 
 
@@ -82,6 +82,22 @@ function vector_dst(x1, y1, x2, y2)
     local dy = y2 - y1
 
     return math.sqrt(dx * dx + dy * dy)
+end
+
+
+function vector_unit(x, y)
+    local d = vector_dst(0, 0, x, y)
+
+    if d == 0 then
+        return 0, 0
+    end
+
+    return x / d, y / d
+end
+
+
+function roundf(v)
+    return math.floor(v + 0.5)
 end
 
 

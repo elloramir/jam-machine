@@ -18,6 +18,9 @@
 
 ENV_DEV = true
 
+ORDER_SIMS = 1
+ORDER_EMITTERS = 2
+
 function love.conf(t)
     t.window.title = ""
     t.window.width = 960

@@ -10,6 +10,7 @@ local Sheet = Object:extend()
 
 function Sheet:new(filename, fw, fh)
     self.img = love.graphics.newImage(filename)
+    self.img:setFilter("nearest", "nearest")
 
     self.width = fw or self.img:getWidth()
     self.height = fh or self.img:getHeight()
@@ -31,7 +32,7 @@ function Sheet:new(filename, fw, fh)
 end
 
 
-function Sheet:frames()
+function Sheet:frames_count()
     return #self.quads
 end
 
@@ -72,7 +73,7 @@ end
 
 
 function Sheet:draw(...)
-    self:drawIndex(1, ...)
+    self:draw_index(1, ...)
 end
 
 

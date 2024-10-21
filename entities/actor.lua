@@ -6,9 +6,8 @@ local lume = require("libs.lume")
 local Sprite = require("entities.sprite")
 
 
--- actors are extended from sprite class but it does
--- not means they are visible elements in game.
--- Some times, only colliders and stuff like that.
+-- this class could be 100% separated from the sprite one,
+-- but since we haven't multiple inheritance, we need to do it.
 local Actor = Sprite:extend()
 
 
@@ -82,10 +81,6 @@ end
 
 
 function Actor.filter(other, self, callback)
-    if self.is_solid and other.is_solid then
-        self:resolve_mtv(other)
-    end
-
     -- we can also have a callback for immediate
     -- "check_overlaps" calls instead of the message system.
     if callback then
@@ -143,6 +138,11 @@ function Actor:check_overlaps(callback)
             if is_overlaping then
                 -- mark it as false to know if it will gets "refreshed"
                 self.body_contacts[actor] = false
+
+                -- @todo: this should be here?
+                if self.is_solid and actor.is_solid then
+                    self:resolve_mtv(actor)
+                end
             else
                 -- we should remove it from both lists, because
                 -- the "check_overlaps" could not being called from "other".
@@ -169,6 +169,11 @@ function Actor:update_contact(other)
 
     -- the second and beyond should only "refresh" the contact
     self.body_contacts[other] = true
+end
+
+
+function Actor:is_grounded()
+    return self.normal_y == -1
 end
 
 
@@ -216,8 +221,8 @@ function Actor:debug()
     -- @note: we just enable this for extra-debug purposes
     -- to see the bottom of the actor
     -- if self.image then
-    --     love.graphics.setColor(0, 0, 0)
-    --     love.graphics.rectangle("line", self.x + self.offset_x, self:bottom(), 2, 2)
+    --     love.graphics.setColor(1, 0, 0)
+    --     love.graphics.circle("fill", self.x + self.offset_x, self:bottom(), 2)
     -- end
 end
 

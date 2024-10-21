@@ -4,27 +4,32 @@
 local view = { }
 
 
+view.binded = ""
 view.layers = { }
 
 
 function view.init()
     view.width = love.graphics.getWidth()
     view.height = love.graphics.getHeight()
+
+    view.new_layer("game", 300, 300)
+    -- view.new_layer("ui", 200, 200)
 end
 
 
-function view.newLayer(name, width, height)
+function view.new_layer(name, width, height)
     local layer = { }
-    local scale = math.max(1, math.min(view.width / width, view.height / height))
-    local x = math.floor((view.width - width * scale) / 2)
-    local y = math.floor((view.height - height * scale) / 2)
+    local scale = roundf(math.max(1, math.min(view.width / width, view.height / height)))
 
-    layer.width = width
-    layer.height = height
+    -- input width and height (we need to save it to use later on resize events)
+    layer.iwidth = width
+    layer.iheight = height
+
+    -- the layer width is result of the input width and height
+    layer.width = roundf(view.width / scale)
+    layer.height = roundf(view.height / scale)
     layer.scale = scale
-    layer.x = x
-    layer.y = y
-    layer.canvas = love.graphics.newCanvas(width, height)
+    layer.canvas = love.graphics.newCanvas(layer.width, layer.height)
 
     view.layers[name] = layer
 end
@@ -35,24 +40,25 @@ function view.resize(width, height)
     view.height = height
 
     for name, layer in pairs(view.layers) do
-        view.newLayer(name, layer.width, layer.height)
+        view.new_layer(name, layer.iwidth, layer.iheight)
     end
 end
 
 
-function view.bind(layer_name, draw_ctx_callback)
+function view.bind(layer_name, draw_callback)
     local layer = view.layers[layer_name]
     assert(layer)
 
+    view.binded = layer_name
     love.graphics.setCanvas(layer.canvas)
     love.graphics.clear()
 
-    draw_ctx_callback()
+    draw_callback()
 
     -- display the layer on the window backbuffer
     love.graphics.setCanvas()
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(layer.canvas, layer.x, layer.y, 0, layer.scale)
+    love.graphics.draw(layer.canvas, 0, 0, 0, layer.scale)
 end
 
 
@@ -71,8 +77,8 @@ function view.mouse(name)
     local x, y = love.mouse.getPosition()
     local scale = layer.scale
 
-    x = (x - layer.x) / scale
-    y = (y - layer.y) / scale
+    x = math.floor(x / scale)
+    y = math.floor(y / scale)
 
     return x, y
 end

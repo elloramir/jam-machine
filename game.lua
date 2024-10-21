@@ -2,6 +2,7 @@
 -- All rights over the code are reserved.
 
 local assets = require("assets")
+local camera = require("camera")
 local input = require("input")
 local lume = require("libs.lume")
 local view = require("view")
@@ -16,16 +17,9 @@ function game.init()
     game.entities = { }
     game.world = shash.new(32)
 
-    view.newLayer("2d", 320, 180)
-
     game.add_entity("player", 0, 0)
-
-    for i = 1, 2 do
-        local x = math.random(0, 320)
-        local y = math.random(0, 180)
-
-        game.add_entity("test", x, y):set_shape(32, 32)
-    end
+    game.add_entity("emitter", 0, 0, 100)
+    game.add_entity("actor", -100, 100):set_shape(300, 10, 0, 0)
 end
 
 
@@ -92,20 +86,25 @@ end
 
 
 local function draw_world()
+    local x, y, w, h = camera.get_view()
+
+    camera.attach()
     for _, en in ipairs(game.entities) do
-        if en.is_visible then
+        -- culling entities in "world-view" bounds
+        if en.is_visible and not en.is_ui and en:cull(x, y, w, h) then
             en:draw()
-            -- @todo: separated pass for debug?
+            -- @note: this will break the batch
             if game.is_debug then
                 en:debug()
             end
         end
     end
+    camera.detach()
 end
 
 
 function game.draw()
-    view.bind("2d", draw_world)
+    view.bind("game", draw_world)
 
     -- debug info
     if game.is_debug then
