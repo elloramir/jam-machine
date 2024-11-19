@@ -49,6 +49,14 @@ function Terminal:new()
     self.commands["motion"] = function(self, value)
         game.motion = tonumber(value) or 1
     end
+
+    game.events:on("keypressed", function(key)
+        self:keypressed(key)
+    end)
+
+    game.events:on("textinput", function(char)
+        self:textinput(char)
+    end)
 end
 
 
@@ -65,18 +73,6 @@ function Terminal:update(dt)
             self:set_visible(false)
         end
     end
-end
-
-
-function love.textinput(key)
-    print(Terminal:first())
-    Terminal:first():textinput(key)
-end
-
-
-function love.keypressed(key)
-    print(Terminal:first())
-    Terminal:first():keypressed(key)
 end
 
 
@@ -140,7 +136,7 @@ function Terminal:draw()
     -- terminal background
     love.graphics.setColor(0, 0.5, 0.5, 0.5)
     love.graphics.rectangle("fill", 0, y, w, th)
-    love.graphics.setFont(assets.get("fonts/debug"))
+    love.graphics.setFont(assets.get("love_font"))
 
     -- last log messages
     for i = 1, 8 do

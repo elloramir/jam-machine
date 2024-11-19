@@ -35,6 +35,18 @@ function love.draw()
     game.draw()
 end
 
+
 function love.quit()
     game.exit()
 end
+
+
+function love.keypressed(key)
+    game.events:emit("keypressed", key)
+end
+
+
+function love.textinput(char)
+    game.events:emit("textinput", char)
+end
+

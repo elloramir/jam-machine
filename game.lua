@@ -7,6 +7,7 @@ local input = require("input")
 local lume = require("libs.lume")
 local view = require("view")
 local shash = require("libs.shash")
+local Emitter = require("emitter")
 
 
 local game = { }
@@ -15,6 +16,7 @@ local game = { }
 function game.init()
     game.is_debug = false
     game.entities = { }
+    game.events = Emitter()
     game.world = shash.new(32)
     game.motion = 1
 
