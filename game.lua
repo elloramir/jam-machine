@@ -19,8 +19,6 @@ function game.init()
     game.events = Emitter()
     game.world = shash.new(32)
     game.motion = 1
-
-    game.add_entity("terminal")
 end
 
 
