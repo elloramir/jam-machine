@@ -1,7 +1,6 @@
 -- Copyright 2024 Elloramir.
 -- All rights over the code are reserved.
 
-local LinkedList = require("libs.linklist")
 local Object = require("libs.classic")
 
 
@@ -14,7 +13,6 @@ function Entity:new(order)
     self.is_visible = true -- ignore this entity in the draw loop
     self.is_active = true -- ignore this entity in the update loop
 
-    self._linked_list:push_back(self)
     self:set_order(order or 0)
 end
 
@@ -58,7 +56,6 @@ end
 function Entity:destroy()
     if not self.is_permanent then
         self.is_alive = false
-        self._linked_list:remove(self)
     end
 end
 
@@ -117,7 +114,6 @@ function Entity:are(tag_name)
 end
 
 
-
 function Entity:update(dt)
 end
 
@@ -136,23 +132,6 @@ end
 
 function Entity:cull(x, y, w, h)
     return true
-end
-
-
-function Entity:extend()
-    local class = self.super.extend(self)
-    class._linked_list = LinkedList.new()
-    return class
-end
-
-
-function Entity:first()
-    return self._linked_list:first()
-end
-
-
-function Entity:iterator()
-    return self._linked_list:iterator()
 end
 
 
