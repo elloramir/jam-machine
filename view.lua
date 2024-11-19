@@ -11,8 +11,8 @@ function view.init()
     view.width = love.graphics.getWidth()
     view.height = love.graphics.getHeight()
 
-    view.new_layer("game", 576, 324)
-    -- view.new_layer("ui", 600, 600)
+    view.new_layer("world", 640, 360)
+    view.new_layer("ui", 640, 360)
 end
 
 
@@ -23,8 +23,8 @@ function view.new_layer(name, width, height)
     layer.width = width
     layer.height = height
     layer.scale = scale
-    layer.x = math.floor((view.width - width * scale) / 2)
-    layer.y = math.floor((view.height - height * scale) / 2)
+    layer.x = roundf((view.width - width * scale) / 2)
+    layer.y = roundf((view.height - height * scale) / 2)
     
     -- creating framebuffer
     layer.canvas = love.graphics.newCanvas(layer.width, layer.height)
@@ -50,7 +50,7 @@ function view.bind(layer_name, draw_callback)
     assert(layer)
 
     love.graphics.setCanvas(layer.canvas)
-    love.graphics.clear(0.05, 0.05, 0.05)
+    love.graphics.clear()
 
     draw_callback()
 

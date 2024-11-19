@@ -4,6 +4,8 @@
 function num_to_color(i, a, m)
     local v = 1610612741
 
+    m = m or 1
+
     v = (v * i) % 0xFFFFFF
     v = (v * 0x10001) % 0xFFFFFF
     v = (v * 0x10001) % 0xFFFFFF
@@ -96,6 +98,13 @@ function vector_unit(x, y)
 end
 
 
+function vector_polar(angle, mag, x, y)
+    x = x or 0
+    y = y or 0
+    return x+math.cos(angle)*mag, y+math.sin(angle)*mag
+end
+
+
 function roundf(v)
     return math.floor(v + 0.5)
 end
@@ -113,4 +122,9 @@ end
 
 function rand_dir()
     return rand_bool() and 1 or -1
+end
+
+
+function extract_filename(path)
+    return path:match("^.+/(.+)%.%w+$")
 end

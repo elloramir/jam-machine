@@ -13,8 +13,6 @@ camera.y = 0
 camera.zoom = 1
 
 -- initial bounds must be something big (kind infinity)
-camera.bound_x = -math.huge
-camera.bound_y = -math.huge
 camera.bound_w =  math.huge
 camera.bound_h =  math.huge
 
@@ -22,9 +20,7 @@ camera.target_x = 0
 camera.target_y = 0
 
 
-function camera.set_bounds(x, y, w, h)
-    camera.bound_x = x
-    camera.bound_y = y
+function camera.set_bounds(w, h)
     camera.bound_w = w
     camera.bound_h = h
 
@@ -34,20 +30,20 @@ end
 
 
 function camera.set_position(x, y, not_smooth)
-    local view_width, view_height = view.size("game")
+    local view_width, view_height = view.size("world")
 
     -- calculate the center of the map
-    local map_center_x = camera.bound_x + camera.bound_w / 2
-    local map_center_y = camera.bound_y + camera.bound_h / 2
+    local map_center_x = camera.bound_w / 2
+    local map_center_y = camera.bound_h / 2
 
     -- calculate the boundaries for camera movement
     local half_view_width = view_width / 2
     local half_view_height = view_height / 2
 
-    local view_min_x = camera.bound_x + half_view_width
-    local view_max_x = camera.bound_x + camera.bound_w - half_view_width
-    local view_min_y = camera.bound_y + half_view_height
-    local view_max_y = camera.bound_y + camera.bound_h - half_view_height
+    local view_min_x = half_view_width
+    local view_max_x = camera.bound_w - half_view_width
+    local view_min_y = half_view_height
+    local view_max_y = camera.bound_h - half_view_height
 
     -- adjust camera position on the x-axis
     if camera.bound_w < view_width then
@@ -67,7 +63,7 @@ function camera.set_position(x, y, not_smooth)
         camera.y = lume.clamp(y, view_min_y, view_max_y)
     end
 
-    if not not_smooth then
+    if not_smooth then 
         camera.target_x = camera.x
         camera.target_y = camera.y
     end
@@ -81,7 +77,7 @@ end
 
 
 function camera.attach()
-    local width, height = view.size("game")
+    local width, height = view.size("world")
     
     love.graphics.push()
     love.graphics.translate(math.floor(width / 2), math.floor(height / 2))
@@ -96,8 +92,8 @@ end
 
 
 function camera.world_mouse()
-    local x, y = view.mouse("game")
-    local width, height = view.size("game")
+    local x, y = view.mouse("world")
+    local width, height = view.size("world")
 
     x = x + camera.target_x - width / 2
     y = y + camera.target_y - height / 2
@@ -108,7 +104,7 @@ end
 
 -- area of the screen that the camera is currently viewing
 function camera.get_view()
-    local width, heigth = view.size("game")
+    local width, heigth = view.size("world")
     local x = camera.target_x - width / 2
     local y = camera.target_y - heigth / 2
 

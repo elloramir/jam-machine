@@ -18,15 +18,18 @@
 
 ENV_DEV = true
 
+ORDER_TILES = 0
 ORDER_SIMS = 1
 ORDER_PLAYER = 2
-ORDER_EMITTERS = 3
-ORDER_DEBUG = 10
+ORDER_BULLET = 3
+ORDER_EMITTERS = 4
+ORDER_DEBUG = 5
+ORDER_UI = 6
 
 function love.conf(t)
     t.window.title = ""
-    t.window.width = 960
-    t.window.height = 540
+    t.window.width = 1280
+    t.window.height = 720
     t.window.vsync = false
     t.window.resizable = true
 end

@@ -52,13 +52,23 @@ function assets.init()
             end
             
             assets.loaded[name] = Sheet(file, w, h)
-        elseif ("tmj,json"):find(ext) then
+        elseif ("tmj,json,tsj,tj"):find(ext) then
             local content = love.filesystem.read(file)
             local decoded = json.decode(content)
 
             assets.loaded[name] = decoded
         elseif ("ogg,mp3,wav"):find(ext) then 
             assets.loaded[name] = Sound(file)
+        elseif ext == "ttf" then
+            -- format is: "name_size.ttf"
+            local size = name:match("_(%d+)$")
+
+            size = tonumber(size) or 12
+            name = name:gsub("_%d+$", "")
+
+            assets.loaded[name] = love.graphics.newFont(file, size)
+        elseif ext == "glsl" then
+            assets.loaded[name] = love.graphics.newShader(file)
         end
     end)
 

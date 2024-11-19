@@ -296,6 +296,22 @@ function Player:update()
 	self:_updatePairs()
 end
 
+-- return the original button mapped to input name, considering the active device
+function Player:getButton(input)
+	local active = self:getActiveDevice()
+	-- @todo: how to handle this correctly?
+	active = active == 'none' and 'kbm' or active
+	for _, source in ipairs(self.config.controls[input]) do
+		local kind, value = parseSource(source)
+
+		if active == 'kbm' and kind == 'key' then
+			return value
+		elseif active == 'joy' and kind == 'button' then
+			return value
+		end
+	end
+end
+
 -- gets the value of a control or axis pair without deadzone applied
 function Player:getRaw(name)
 	if self._pairs[name] then

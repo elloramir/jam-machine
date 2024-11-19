@@ -54,27 +54,18 @@ function Tilemap:gen_colliders()
     local size = self.tileset.width
     local visited = {}
 
-    -- Helper function to mark tiles as visited
-    local function mark_visited(x, y, w, h)
-        for j = y, y + h - 1 do
-            for i = x, x + w - 1 do
-                visited[hash2d(i, j)] = true
-            end
-        end
-    end
-
-    -- Greedy algorithm to create larger colliders
+    -- greedy algorithm to create larger colliders
     for y = 0, self.rows - 1 do
         for x = 0, self.cols - 1 do
             local id = self:get_tile(x, y)
             if id ~= 0 and not visited[hash2d(x, y)] then
-                -- Determine the width (w) of the collider
+                -- determine the width (w) of the collider
                 local w = 1
                 while x + w < self.cols and self:get_tile(x + w, y) == id and not visited[hash2d(x + w, y)] do
                     w = w + 1
                 end
 
-                -- Determine the height (h) of the collider
+                -- determine the height (h) of the collider
                 local h = 1
                 local is_rectangular = true
                 while is_rectangular and y + h < self.rows do
@@ -89,13 +80,17 @@ function Tilemap:gen_colliders()
                     end
                 end
 
-                -- Create a collider for the found rectangular area
+                -- create a collider for the found rectangular area
                 local x0 = self.x + x * size
                 local y0 = self.y + y * size
                 table.insert(self.colliders, game.add_entity("collider", x0, y0, w * size, h * size))
 
-                -- Mark tiles as visited
-                mark_visited(x, y, w, h)
+                -- mmark tiles as visited
+                for j = y, y + h - 1 do
+                    for i = x, x + w - 1 do
+                        visited[hash2d(i, j)] = true
+                    end
+                end
             end
         end
     end

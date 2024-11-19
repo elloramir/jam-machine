@@ -10,7 +10,7 @@ local Sampler = Object:extend()
 local Sound = Object:extend()
 
 
-Sound.base_volume = 0.1
+Sound.base_volume = 0.3
 Sound.max_audio_stack = 10
 Sound.tweens = flux.group()
 Sound.timers = tick.group()
@@ -82,7 +82,7 @@ function Sound:play(volume)
         return
     end
 
-    sampler:set_volume(volume)
+    sampler:set_volume(volume or 1)
     sampler:set_state(true)
 
     return sampler

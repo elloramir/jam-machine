@@ -16,6 +16,9 @@ function game.init()
     game.is_debug = false
     game.entities = { }
     game.world = shash.new(32)
+    game.motion = 1
+
+    game.add_entity("terminal")
 end
 
 
@@ -45,6 +48,7 @@ end
 
 
 function game.update(dt)
+    dt = dt * game.motion
     input:update()
 
     -- toggle debug mode
@@ -57,16 +61,18 @@ function game.update(dt)
     end
 
     for i, en in lume.ripairs(game.entities) do
-        if not en.is_alive then
-            table.remove(game.entities, i)
-            en:destruct()
-        elseif en.is_active then
-            en:update(dt)
+        if en then
+            if not en.is_alive then
+                table.remove(game.entities, i)
+                en:destruct()
+            elseif en.is_active then
+                en:update(dt)
+            end
         end
     end
 
-    table.sort(game.entities, sort_entities)
     camera.update(dt)
+    table.sort(game.entities, sort_entities)
 end
 
 
@@ -87,12 +93,14 @@ local function draw_world()
 
     camera.attach()
     for _, en in ipairs(game.entities) do
-        -- culling entities in "world-view" bounds
-        if en.is_visible and not en.is_ui and en:cull(x, y, w, h) then
-            en:draw()
+        if en then
+            -- culling entities in "world-view" bounds
+            if en.is_visible and not en.is_ui and en:cull(x, y, w, h) then
+                en:draw()
 
-            if game.is_debug then
-                en:debug()
+                if game.is_debug then
+                    en:debug()
+                end
             end
         end
     end
@@ -100,19 +108,48 @@ local function draw_world()
 end
 
 
+local function draw_ui()
+    for _, en in ipairs(game.entities) do
+        if en then
+            if en.is_visible and en.is_ui then
+                en:draw()
+            end
+        end
+    end
+end
+
+
 function game.draw()
-    view.bind("game", draw_world)
+    view.bind("world", draw_world)
+    view.bind("ui", draw_ui)
 
     -- debug info
     if game.is_debug then
         local status = love.graphics.getStats()
+
+        love.graphics.setFont(assets.get("fonts/debug"))
 
         draw_info(string.format("fps: %d", love.timer.getFPS()), 0)
         draw_info(string.format("entities: %d", #game.entities), 1)
         draw_info(string.format("sys mem: %.2fmb", collectgarbage("count")/1024), 2)
         draw_info(string.format("tex mem: %.2fmb", status.texturememory/1048576), 3)
         draw_info(string.format("drawcalls: %d", status.drawcalls), 4)
-        draw_info(string.format("mouse: %d, %d", view.mouse("game")), 5) 
+        draw_info(string.format("mouse: %d, %d", view.mouse("world")), 5) 
+    end
+end
+
+
+function game.exit()
+    love.event.quit()
+end
+
+
+function game.clear()
+    for i, en in ipairs(game.entities) do
+        if not en.is_permanent then
+            en:destruct()
+            table.remove(game.entities, i)
+        end
     end
 end
 
