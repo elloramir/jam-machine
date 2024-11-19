@@ -127,7 +127,7 @@ function game.draw()
     if game.is_debug then
         local status = love.graphics.getStats()
 
-        love.graphics.setFont(assets.get("fonts/debug"))
+        love.graphics.setFont(assets.get("love_font"))
 
         draw_info(string.format("fps: %d", love.timer.getFPS()), 0)
         draw_info(string.format("entities: %d", #game.entities), 1)
