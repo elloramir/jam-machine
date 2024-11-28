@@ -1,13 +1,14 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
 
-local assets = require("assets")
-local camera = require("camera")
-local input = require("input")
+
+local assets = require("engine.assets")
+local camera = require("engine.camera")
+local input = require("engine.input")
 local lume = require("libs.lume")
-local view = require("view")
+local view = require("engine.view")
 local shash = require("libs.shash")
-local Emitter = require("emitter")
+local Emitter = require("engine.emitter")
 
 
 local game = { }
@@ -34,15 +35,12 @@ end
 
 function game.add_entity(en, ...)
     en = type(en) == "string" and new_en(en, ...) or en
+    en.wakeup()
     return lume.push(game.entities, en)
 end
 
 
 local function sort_entities(a, b)
-    if a.should_sort_y and b.should_sort_y then
-        return (a:bottom() + a.order) < (b:bottom() + b.order)
-    end
-
     return a.order < b.order
 end
 
@@ -81,7 +79,7 @@ local function draw_info(txt, i)
     local w = font:getWidth(txt) + 5
     local h = font:getHeight() + 5
 
-    love.graphics.setColor(num_to_color(i+0xdead, 1, 0.5))
+    love.graphics.setColor(num_to_color(i, 1, 0.5))
     love.graphics.rectangle("fill", 5, 5 + i * (h + 2), w, h, 3)
     love.graphics.setColor(1, 1, 1)
     love.graphics.print(txt, 7, 7 + i * (h + 2))

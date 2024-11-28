@@ -1,5 +1,6 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
+--
 --
 --      ███████╗██╗     ██╗      █████╗ ██████╗  █████╗
 --      ██╔════╝██║     ██║     ██╔══██╗██╔══██╗██╔══██╗
@@ -7,6 +8,14 @@
 --      ██╔══╝  ██║     ██║     ██║  ██║██╔══██╗██╔══██║
 --      ███████╗███████╗███████╗╚█████╔╝██║  ██║██║  ██║
 --      ╚══════╝╚══════╝╚══════╝ ╚════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+--         ____    ____  ____    ____  ____    ____ 
+--        |    \  /    ||    \  /    ||    \  /    |
+--        |  o  )|  o  ||  _  ||  o  ||  _  ||  o  |
+--        |     ||     ||  |  ||     ||  |  ||     |
+--        |  O  ||  _  ||  |  ||  _  ||  |  ||  _  |
+--        |     ||  |  ||  |  ||  |  ||  |  ||  |  |
+--        |_____||__|__||__|__||__|__||__|__||__|__|
+--
 --
 -- This is our game's source code, before you start reading it, you need to understand some topics
 -- 01 - we use OOP, but not in a religious way ¯\_(ツ)
@@ -17,14 +26,6 @@
 
 
 ENV_DEV = true
-
-ORDER_TILES = 0
-ORDER_SIMS = 1
-ORDER_PLAYER = 2
-ORDER_BULLET = 3
-ORDER_EMITTERS = 4
-ORDER_DEBUG = 5
-ORDER_UI = 6
 
 function love.conf(t)
     t.window.title = ""

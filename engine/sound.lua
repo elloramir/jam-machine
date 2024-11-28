@@ -1,5 +1,6 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
+
 
 local tick = require("libs.tick")
 local flux = require("libs.flux")
@@ -16,13 +17,14 @@ Sound.tweens = flux.group()
 Sound.timers = tick.group()
 
 
-function Sampler:new(filename)
-    self.raw = love.audio.newSource(filename, "static")
+function Sampler:new(filename, mode)
+    self.raw = love.audio.newSource(filename, mode or "static")
 end
 
 
 function Sampler:set_volume(volume)
-    self.raw:setVolume(volume * Sound.base_volume)
+    self.volume = volume * Sound.base_volume
+    self.raw:setVolume(self.volume)
 end
 
 
@@ -40,13 +42,13 @@ function Sampler:is_playing()
 end
 
 
+-- @todo:
 function Sampler:fade_in(duration, callback) 
-    Sound.tweens:to(self, duration, {volume = self.raw:getVolume()}):oncomplete(callback)
 end
 
 
+-- @todo:
 function Sampler:fade_out(duration, callback)
-    Sound.tweens:to(self, duration, {volume = 0}):oncomplete(callback)
 end
 
 

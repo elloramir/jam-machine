@@ -1,5 +1,6 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
+
 
 local Actor = require("entities.actor")
 

@@ -1,7 +1,8 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
 
-local game = require("game")
+
+local game = require("engine.game")
 local lume = require("libs.lume")
 local Sprite = require("entities.sprite")
 
@@ -23,16 +24,26 @@ function Actor:new(x, y)
     self.normal_y = 0
 end
 
+function Actor:enable_sort_y()
+    self.should_sort_y = true
+end
+
 
 function Actor:set_shape(w, h, ox, oy, is_solid)
     self.width = w
     self.height = h
     self.offset_x = math.floor((ox or 0.5) * w)
     self.offset_y = math.floor((oy or 0.5) * h)
-    self.has_shape = true
     self.is_solid = is_solid == nil and true or is_solid
 
-    game.world:add(self, self:shape())
+    if self.has_shape then
+        -- just update what we already have
+        self:update_body()
+    else
+        -- create a body reference on world if not created yeat
+        self.has_shape = true
+        game.world:add(self, self:shape())
+    end
 end
 
 
@@ -40,12 +51,16 @@ function Actor:set_position(x, y)
     if x ~= self.x or y ~= self.y then
         self.x, self.y = x, y
         self:update_body()
+        if self.should_sort_y then
+            self:set_order(self:bottom())
+        end
     end
 end
 
 
 function Actor:destruct()
     game.world:remove(self)
+    self.has_shape = false
 end
 
 

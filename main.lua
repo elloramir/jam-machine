@@ -1,12 +1,13 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
 
-require("utils")
+
+require("engine.utils")
 
 
-local assets = require("assets")
-local game = require("game")
-local view = require("view")
+local assets = require("engine.assets")
+local game = require("engine.game")
+local view = require("engine.view")
 
 
 function love.load()

@@ -1,11 +1,12 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
 
-local assets = require("assets")
-local camera = require("camera")
-local game = require("game")
+
+local assets = require("engine.assets")
+local camera = require("engine.camera")
+local game = require("engine.game")
 local lume = require("libs.lume")
-local Entity = require("entity")
+local Entity = require("engine.entity")
 
 
 local Tilemap = Entity:extend()

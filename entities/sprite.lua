@@ -1,9 +1,10 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
 
-local assets = require("assets")
-local game = require("game")
-local entity = require("entity")
+
+local assets = require("engine.assets")
+local game = require("engine.game")
+local entity = require("engine.entity")
 
 
 local Sprite = entity:extend()

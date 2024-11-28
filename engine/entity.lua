@@ -1,7 +1,8 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
 
-local Emitter = require("emitter")
+
+local Emitter = require("engine.emitter")
 
 
 local Entity = Emitter:extend()
@@ -9,7 +10,7 @@ local Entity = Emitter:extend()
 
 function Entity:new(order)
     self.created_at = love.timer.getTime() / 1e7
-    self.is_alive = true -- delete this entity in the next frame
+    self.is_alive = false -- delete this entity in the next frame
     self.is_visible = true -- ignore this entity in the draw loop
     self.is_active = true -- ignore this entity in the update loop
 
@@ -22,11 +23,6 @@ function Entity:set_visible(visible)
 end
 
 
-function Entity:enable_sort_y()
-    self.should_sort_y = true
-end
-
-
 function Entity:mark_as_ui()
     self.is_ui = true
 end
@@ -34,13 +30,6 @@ end
 
 function Entity:mark_as_permanent()
     self.is_permanent = true
-end
-
-
--- this function is used on the y-sort. If you enable the y-sort
--- and you don't have that function overrided, the game will intentionally crash.
-function Entity:bottom()
-    error("not overriden")
 end
 
 
@@ -95,6 +84,10 @@ end
 
 
 function Entity:destruct()
+end
+
+
+function Entity:wakeup()
 end
 
 

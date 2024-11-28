@@ -1,5 +1,6 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
+
 
 function num_to_color(i, a, m)
     local v = 1610612741

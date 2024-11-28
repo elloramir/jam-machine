@@ -1,10 +1,11 @@
--- Copyright 2024 Elloramir.
+-- Copyright 2024 Banana Suit.
 -- All rights over the code are reserved.
+
 
 local json = require("libs.json")
 local lume = require("libs.lume")
-local Sheet = require("sheet")
-local Sound = require("sound")
+local Sheet = require("engine.sheet")
+local Sound = require("engine.sound")
 
 
 local assets = {}
